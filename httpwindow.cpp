@@ -7,9 +7,9 @@
 HttpWindow::HttpWindow(QWidget *parent)
 #ifdef Q_WS_MAEMO_5
     : QWidget(parent)
-#else
+    #else
     : QDialog(parent)
-#endif
+    #endif
 {
 #ifndef QT_NO_OPENSSL
     urlLineEdit = new QLineEdit("https://qt-project.org/");
@@ -36,8 +36,9 @@ HttpWindow::HttpWindow(QWidget *parent)
     progressDialog = new QProgressDialog(this);
 #endif
 
-    connect(urlLineEdit, SIGNAL(textChanged(QString)),
-            this, SLOT(enableDownloadButton()));
+    //    connect(urlLineEdit, SIGNAL(textChanged(QString)),
+    //            this, SLOT(enableDownloadButton()));
+    enableDownloadButton();
 
     connect(&qnam, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)),
             this, SLOT(slotAuthenticationRequired(QNetworkReply*,QAuthenticator*)));
@@ -61,7 +62,7 @@ HttpWindow::HttpWindow(QWidget *parent)
     mainLayout->addWidget(buttonBox);
     setLayout(mainLayout);
 
-    setWindowTitle(tr("HTTP"));
+    setWindowTitle(tr("Requete meteo"));
     urlLineEdit->setFocus();
 }
 
@@ -78,8 +79,20 @@ void HttpWindow::startRequest(QUrl url)
 
 void HttpWindow::downloadFile()
 {
-    url = urlLineEdit->text();
+    QString newt;
+    city = urlLineEdit->text();
+    newt = "https://qt-project.org/";
 
+    //maintenant plus besoin du lien, il faut juste choisir la ville entre Paris et sherbrooke.. a améliorer
+
+    if(city.compare("sherbrooke")==0){
+        newt = "http://api.openweathermap.org/data/2.5/forecast?id=6146143&appid=b9e492fcafc4d9069398dfcd894d391c";
+    }
+    if(city.compare("paris")==0){
+        newt = "http://api.openweathermap.org/data/2.5/forecast?id=6942553&appid=b9e492fcafc4d9069398dfcd894d391c";
+    }
+
+    url = newt;
     QFileInfo fileInfo(url.path());
     QString fileName = fileInfo.fileName();
     if (fileName.isEmpty())
@@ -90,7 +103,7 @@ void HttpWindow::downloadFile()
                                   tr("There already exists a file called %1 in "
                                      "the current directory. Overwrite?").arg(fileName),
                                   QMessageBox::Yes|QMessageBox::No, QMessageBox::No)
-            == QMessageBox::No)
+                == QMessageBox::No)
             return;
         QFile::remove(fileName);
     }

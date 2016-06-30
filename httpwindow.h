@@ -56,6 +56,7 @@ private:
     QPushButton *quitButton;
     QDialogButtonBox *buttonBox;
 
+    QString city;
     QUrl url;
     QNetworkAccessManager qnam;
     QNetworkReply *reply;
